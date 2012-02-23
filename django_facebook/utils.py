@@ -46,7 +46,7 @@ def test_permissions(request, scope_list, redirect_uri=None):
     return scope_allowed
 
 
-def get_oauth_url(request, scope, redirect_uri=None, extra_params=None):
+def get_oauth_url(request, scope, redirect_uri=None, extra_params=None, canvas=False):
     '''
     Returns the oauth url for the given request and scope
     Request maybe shouldnt be tied to this function, but for now it seems
@@ -57,7 +57,11 @@ def get_oauth_url(request, scope, redirect_uri=None, extra_params=None):
     query_dict = QueryDict('', True)
     query_dict['scope'] = ','.join(scope)
     query_dict['client_id'] = facebook_settings.FACEBOOK_APP_ID
-    redirect_uri = redirect_uri or request.build_absolute_uri()
+    if not redirect_uri:
+        if canvas:
+            redirect_uri = facebook_settings.FACEBOOK_CANVAS_PAGE            
+        else:
+            redirect_uri = request.build_absolute_uri()
 
     # set attempt=1 to prevent endless redirect loops
     if 'attempt=1' not in redirect_uri:

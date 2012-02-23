@@ -26,7 +26,7 @@ def facebook_required(view_func=None, scope=fb_settings.FACEBOOK_DEFAULT_SCOPE,
     def actual_decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-            oauth_url, redirect_uri = get_oauth_url(request, scope_list)
+            oauth_url, redirect_uri = get_oauth_url(request, scope_list, canvas=canvas)
             if test_permissions(request, scope_list, redirect_uri):
                 return view_func(request, *args, **kwargs)
             else:
@@ -59,7 +59,7 @@ def facebook_required_lazy(view_func=None,
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
             oauth_url, redirect_uri = get_oauth_url(request, scope_list,
-                                                    extra_params=extra_params)
+                                                    extra_params=extra_params, canvas=canvas)
             try:
                 # call get persistent graph and convert the
                 # token with correct redirect uri
