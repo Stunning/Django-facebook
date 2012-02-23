@@ -22,9 +22,11 @@ def test_permissions(request, scope_list, redirect_uri=None):
         try:
             permissions_response = fb.get('me/permissions')
             permissions = permissions_response['data'][0]
+            logger.debug("User has granted us these permissions: " + str(permissions))
         except facebook_exceptions.OAuthException:
             # this happens when someone revokes their permissions
             # while the session is still stored
+            logger.warning("Failed to retrieve me/permissions")
             permissions = {}
         permissions_dict = dict([(k, bool(int(v)))
                                  for k, v in permissions.items()
@@ -38,6 +40,7 @@ def test_permissions(request, scope_list, redirect_uri=None):
 
     # raise if this happens after a redirect though
     if not scope_allowed and request.GET.get('attempt'):
+        logger.error("Failed to get permissions")
         raise ValueError(
               'Somehow facebook is not giving us the permissions needed, ' \
               'lets break instead of endless redirects. Fb was %s and ' \
